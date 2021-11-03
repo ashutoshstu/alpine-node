@@ -1,9 +1,7 @@
-name: Continuous Integration
+name: ci
 
 on:
   pull_request:
-    branches: 
-    - main
   push:
     branches:
       - master
@@ -26,20 +24,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: Login do docker.io
-        if: startsWith(github.ref, 'refs/tags/')
         run: docker login -u abhishek138 -p ${{ secrets.DOCKER_TOKEN }}
       - name: build and publish image
-        if: startsWith(github.ref, 'refs/tags/')
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./extract.dockerfile
           platforms: linux/amd64,linux/arm64
-          push: ${{ startsWith(github.ref, 'refs/tags/') }}
+          push: true
           tags: |
-            abhishek138/node:${{ steps.prepare.outputs.tag_name }}
-            abhishek138/node:latest
-            
-            
-            
+            abhishek138/alpine:${{ steps.prepare.outputs.tag_name }}
+            abhishek138/alpine:latest
